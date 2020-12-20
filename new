@@ -32,6 +32,7 @@ ZONE2_targets_fore = [134,101,95,96,77,88,101,78]
 ZONE2_targets_back = [174,156,139,97,101,125,79,53]
 ZONE3_targets_fore = [238,261,257,277,251,277,237.307]
 ZONE3_targets_back = [222,261,353,279,261,272,273,303]
+keys = ["title","markname","kind","url_images","content"]
 
 for num in range(3):
 #select type of judgement.
@@ -52,11 +53,10 @@ for num in range(3):
             list_back = json.loads(res_back.text)
             item_back = 0
             item_fore = 0
-            d1 = []
-            d2 = []
-
+            
             # crawler fore year data
             for i in list_fore['receiveData']['resultArr']:
+                d1 = {}
                 try:
                     kind_fore = i['DPT_KIND']
                     mark_fore = i['MARK_NAME']
@@ -84,10 +84,25 @@ for num in range(3):
                     if not os.path.exists('%s/%s/%s.jpg' %(paths[num],years[year],title_fore)):
                         urllib.request.urlretrieve(url_images,'%s/%s/%s.jpg' %(paths[num],years[year],title_fore))
                     
-                    # set result to dict and convert to json.
-                    d1.append({"title":title_fore,"markname":mark_fore,"kind":kind_fore,"url_images":url_images,"content": content_fore})
-
+                    #key:value
+                    values = [title_fore,mark_fore,kind_fore,url_images,content_fore]
+                    for n in range(len(keys)):
+                        d1[keys[n]]=values[n]
                     
+                    #save jsonfile
+                    try:
+                        with open('%s/%s_fore.json' %(paths[num],years[year]), 'a', encoding='utf-8') as f:
+                            json.dump(d1, f, ensure_ascii=False)
+                            f.write('\n')
+                    except FileNotFoundError as e:
+                        no_fore = no_fore.replace('/', '-')
+                        with open('%s/%s_fore.json' %(paths[num],years[year]), 'a', encoding='utf-8') as f:
+                            json.dump(d1, f, ensure_ascii=False)
+                            f.write('\n')
+                    except OSError:
+                        pass
+                    print("save json complete!===========================================================")
+
                     #print result
                     item_fore +=1
                     if dkind[num] == "OPP":
@@ -96,7 +111,10 @@ for num in range(3):
                         print(dkind[num],years[year],'fore: ',item_fore,"/%s"%(ZONE2_targets_fore[year]), title_fore)
                     if dkind[num] == "REV":
                         print(dkind[num],years[year],'fore: ',item_fore,"/%s"%(ZONE3_targets_fore[year]), title_fore)
-                        
+                    
+                    #sleep
+                    sleep(randint(5,7))
+                    
                 except TypeError as e:
                     print('==========')
                     print(title_fore,': no content found')
@@ -110,23 +128,12 @@ for num in range(3):
                     print('==========')
                     continue
                     
-            #save jsonfile
-            try:
-                with open('%s/%s_fore.json' %(paths[num],years[year]), 'w', encoding='utf-8') as f:
-                    json.dump(d1, f, ensure_ascii=False)
-            except FileNotFoundError as e:
-                no_fore = no_fore.replace('/', '-')
-                with open('%s/%s_fore.json' %(paths[num],years[year]), 'w', encoding='utf-8') as f:
-                    json.dump(d1, f, ensure_ascii=False)
-            except OSError:
-                pass
-            print("save json complete!===========================================================")
-
-            #sleep range (from 1 to 7)
+            #sleep range
             sleep(randint(60,65))
 
             # crawler back year data
             for j in list_back['receiveData']['resultArr']:
+                d2 = {}
                 try:
                     kind_back = j['DPT_KIND']
                     mark_back = j['MARK_NAME']
@@ -153,9 +160,25 @@ for num in range(3):
                     if not os.path.exists('%s/%s/%s.jpg' %(paths[num],years[year],title_back)):
                         urllib.request.urlretrieve(url_images2,'%s/%s/%s.jpg' %(paths[num],years[year],title_back))
 
-                    # set result to dict format
-                    d2.append({"title":title_back,"mark_name":mark_back,"kind":kind_back,"url_images": url_images2,"content": content_back})
-
+                    #key:value
+                    values = [title_back,mark_back,kind_back,url_images2,content_back]
+                    for n in range(len(keys)):
+                        d2[keys[n]]=values[n]
+                    
+                    #save jsonfile
+                    try:
+                        with open('%s/%s_back.json' %(paths[num],years[year]), 'a', encoding='utf-8') as f:
+                            json.dump(d2, f, ensure_ascii=False)
+                            f.write('\n')
+                    except FileNotFoundError as e:
+                        no_back = no_back.replace('/', '-')
+                        with open('%s/%s_back.json' %(paths[num],years[year]), 'a', encoding='utf-8') as f:
+                            json.dump(d2, f, ensure_ascii=False)
+                            f.write('\n')
+                    except OSError:
+                        pass
+                    print("save json complete!===========================================================")
+            
                     #print result
                     item_back +=1
                     if dkind[num] == "OPP":
@@ -164,7 +187,10 @@ for num in range(3):
                         print(dkind[num],years[year],'back: ',item_back,"/%s"%(ZONE1_targets_back[year]), title_back)
                     if dkind[num] == "REV":
                         print(dkind[num],years[year],'back: ',item_back,"/%s"%(ZONE1_targets_back[year]), title_back)
-                        
+                    
+                    #sleep
+                    sleep(randint(5,7))
+                    
                 except TypeError as e:
                     print('==========')
                     print(title_back,': no content found')
@@ -178,19 +204,7 @@ for num in range(3):
                     print('==========')
                     continue
             
-            #save jsonfile
-            try:
-                with open('%s/%s_back.json' %(paths[num],years[year]), 'w', encoding='utf-8') as f:
-                    json.dump(d2, f, ensure_ascii=False)
-            except FileNotFoundError as e:
-                no_back = no_back.replace('/', '-')
-                with open('%s/%s_back.json' %(paths[num],years[year]), 'w', encoding='utf-8') as f:
-                    json.dump(d2, f, ensure_ascii=False)
-            except OSError:
-                pass
-            print("save json complete!===========================================================")
-            
-            #sleep range (from 1 to 7)
+            #sleep range
             sleep(randint(60,65))
 
         except json.JSONDecodeError as e:
